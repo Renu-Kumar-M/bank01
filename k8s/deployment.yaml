@@ -13,5 +13,7 @@ spec:
         app: banking-app
     spec:
       containers:
-      - name: banking-container
-        image: DOCKER_HUB_USERNAME/simple-banking-app:v1
+      - name: banking-app
+        image: renukumarm06/simple-banking-app:v-web
+        ports:
+        - containerPort: 5000

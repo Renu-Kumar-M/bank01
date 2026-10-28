@@ -1,34 +1,26 @@
-class BankAccount:
-    def __init__(self, balance=0.0):
-        self.balance = balance
-    def check_balance(self):
-        return self.balance
-    def deposit(self, amount):
-        if amount <= 0:
-            raise ValueError("Deposit amount must be positive")
-        self.balance += amount
-        return self.balance
-def main():
-    account = BankAccount()
-    while True:
-        print("\n--- Simple Banking Menu ---")
-        print("1. Check Balance")
-        print("2. Deposit Money")
-        print("3. Exit")
-        choice = input("Enter choice: ").strip()
-        if choice == "1":
-            print(f"Current Balance: ${account.check_balance():.2f}")
-        elif choice == "2":
-            try:
-                amt = float(input("Enter deposit amount: "))
-                account.deposit(amt)
-                print(f"Deposited ${amt:.2f}. New Balance: ${account.check_balance():.2f}")
-            except ValueError as e:
-                print(f"Error: {e}")
-        elif choice == "3":
-            print("Exiting application.")
-            break
-        else:
-            print("Invalid choice. Please try again.")
-if __name__ == "__main__":
-    main()
+from flask import Flask, jsonify, request
+app = Flask(__name__)
+balance = 100.0
+@app.route('/', methods=['GET'])
+def home():
+    return jsonify({
+        "message": "Welcome to the Simple Banking API!",
+        "endpoints": {
+            "check_balance": "/balance [GET]",
+            "deposit": "/deposit [POST]"
+        }
+    })
+@app.route('/balance', methods=['GET'])
+def get_balance():
+    return jsonify({"balance": balance})
+@app.route('/deposit', methods=['POST'])
+def deposit_money():
+    global balance
+    data = request.get_json() or {}
+    amount = data.get("amount", 0)
+    if amount <= 0:
+        return jsonify({"error": "Invalid deposit amount"}), 400
+    balance += amount
+    return jsonify({"message": f"Deposited ${amount} successfully", "new_balance": balance})
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
